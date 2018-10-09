@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Custom TabLayout</string>
+
+    <string name="page_number" formatted="true">Page №%d</string>
+</resources>

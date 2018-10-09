@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="colorOrderTabBack">#a5edd8</color>
+    <color name="colorOrderTabCurrent">#1ed29d</color>
+    <color name="colorOrderTabNext">#f9f9f9</color>
+
+    <color name="colorOrderTabNextDivider">#e6e6e6</color>
+    <color name="colorOrderTabTextNext">#999999</color>
+    <color name="colorErrorRed">#ff0d3b</color>
+
+</resources>
