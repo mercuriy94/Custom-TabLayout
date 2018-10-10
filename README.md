@@ -2,7 +2,7 @@
 
 ### Для чего он?
 
-Данный проект предназначен для демонстриации способа кастомизации TabLayout.
+Данный проект предназначен для демонстрации способа кастомизации TabLayout.
 Как например на гифке ниже.
 
 ![](https://github.com/mercuriy94/Custom-TabLayout/blob/master/images/sample.gif?raw=true)
