@@ -4,9 +4,9 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="colorOrderTabBack">#a5edd8</color>
-    <color name="colorOrderTabCurrent">#1ed29d</color>
-    <color name="colorOrderTabNext">#f9f9f9</color>
+    <color name="colorTabBack">#a5edd8</color>
+    <color name="colorTabSelected">#1ed29d</color>
+    <color name="colorTabNext">#f9f9f9</color>
 
     <color name="colorOrderTabNextDivider">#e6e6e6</color>
     <color name="colorOrderTabTextNext">#999999</color>
