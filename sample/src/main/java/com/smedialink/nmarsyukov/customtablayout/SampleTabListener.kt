@@ -14,10 +14,14 @@ class SampleTabListener : TabLayout.OnTabSelectedListener {
 
             tabLayout.getTabAt(i)?.let { tab ->
 
+                //Устанавливем камтомную вью, если этого небыло сделанно ранее
                 if (tab.customView == null) {
+
+
                     val tabView = LayoutInflater.from(tabLayout.context)
                             .inflate(R.layout.custom_tab, tabLayout, false)
                     tab.customView = tabView
+
                 }
 
                 tab.customView?.apply {
@@ -25,14 +29,19 @@ class SampleTabListener : TabLayout.OnTabSelectedListener {
                     tvTabTitle.text = tabLayout.context.getString(R.string.page_number, (i + 1))
 
                     when {
+                        //Если позиция таба меньше выбранного
                         i < tabLayout.selectedTabPosition -> {
                             rootTabLayout.setBackgroundColor(ContextCompat.getColor(tabLayout.context,
                                     R.color.colorTabBack))
                         }
+
+                        //Если таб явялется выбранным
                         i == tabLayout.selectedTabPosition -> {
                             rootTabLayout.setBackgroundColor(ContextCompat.getColor(tabLayout.context,
                                     R.color.colorTabSelected))
                         }
+
+                        //Если таб по позиции расположен выше выбранного
                         else -> {
                             rootTabLayout.setBackgroundColor(ContextCompat.getColor(tabLayout.context,
                                     R.color.colorTabNext))
@@ -55,6 +64,5 @@ class SampleTabListener : TabLayout.OnTabSelectedListener {
     override fun onTabSelected(p0: TabLayout.Tab) = updateTabs(p0.parent)
 
     //endregion TabLayout.OnTabSelectedListener
-
 
 }

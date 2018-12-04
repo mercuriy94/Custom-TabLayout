@@ -2,14 +2,12 @@
 
 ### Для чего он?
 
-Данный проект предназначен для демонстрации способа кастомизации TabLayout.
+Данный проект предназначен для демонстриации способа кастомизации TabLayout.
 Как например на гифке ниже.
 
 ![](https://github.com/mercuriy94/Custom-TabLayout/blob/master/images/sample.gif?raw=true)
 
 ### В чем соль?
-
-![](http://pavon.kz/cache/normal/media/img/gallery/source/1757/1397196341_13958330342959.jpeg)
 
 Не для кого не секрет, что используя TabLayout в связке с ViewPager, то неявно создаются объекты - Tab-ы. 
 
@@ -48,104 +46,80 @@
   
 ~~~
 
-Выше представлены поля класса Tab. И я не просто так оставил два методы `getCustomView` и `setCustomView`. Именно customView позволяет нам без труда подставить свою вьюху, чтобы tab layout соответствовал дизайну.
+Выше представлены поля класса Tab. А также разработчики оставили нам два метода `getCustomView` и `setCustomView`. Именно customView позволяет нам без труда подставить свою вьюху для представления таба, чтобы tab layout соответствовал дизайну установленного вашим проектом.
 
 ### Окей, а как реализовать?
 
-На самом деле варианты реализации ограничиваются лишь вашим воображением. Но давайте я в кратце расскажу как я это реализовал в своем примере.
- 
-Первым делом создадим класс CustomTabLayout и и унаследуем его от TabLayout. 
-Мы с вами значем, что в  api базовго класса есть  публичный метод addTab, давайте его расширим. 
-Получаем примерно такой метод 
+В данном примере представлена лишь одна из возможных вариантов реализации. 
+Главной задачей является управлением представлением таба в зависимости от его состояния. 
+Для этого хорошо подходит слушатель - TabLayout.OnTabSelectedListener. 
+Остается его реализовать.
 
 ~~~ java
 ...
   
-  override fun addTab(tab: Tab, position: Int, setSelected: Boolean) {
-        super.addTab(tab, position, setSelected)
+class SampleTabListener : TabLayout.OnTabSelectedListener {
 
-        //Передаем кастомную вьюху, которая будет отображаться вместо дефолтной
-        tab.customView = CustomTabView(context)
-        //принидительно обновляем табы
-        updateTabs()
+    private fun updateTabs(tabLayout: TabLayout) {
 
-    }
+        // Перебираем все табы, чтобы применить к ним цветовые схемы
+        for (i in 0 until tabLayout.tabCount) {
 
-...
-~~~
+            tabLayout.getTabAt(i)?.let { tab ->
+              
+                //Устанавливем камтомную вью, если этого небыло сделанно ранее
+                if (tab.customView == null) {
+                    val tabView = LayoutInflater.from(tabLayout.context)
+                            .inflate(R.layout.custom_tab, tabLayout, false)
+                    tab.customView = tabView
+                }
 
-По сути мы просто передали нашу кастомную вьюху (вы можете раздуть вашу любую вьюху например из ресурсов layout).
+                tab.customView?.apply {
 
-Окей, а как быть с переключением табов, как понять когда надо перерисовать наши кастомные табы?
+                    tvTabTitle.text = tabLayout.context.getString(R.string.page_number, (i + 1))
 
-Изучив класс TabLayout я обнаружил метод `selectTab` . Он вызывается всегда когда позиция выбранного таба изменилась. Но есть один ньюанс! Он имеет дефолтный модифкатор доступа. Уууупс!
+                    when {
+                        //Если позиция таба меньше выбранного
+                        i < tabLayout.selectedTabPosition -> {
+                            rootTabLayout.setBackgroundColor(ContextCompat.getColor(tabLayout.context,
+                                    R.color.colorTabBack))
+                        }
 
-Решение -  переместить наш кастомный таб в пакет в котором и находится базовый TabLayout. 
+                        //Если таб явялется выбранным
+                        i == tabLayout.selectedTabPosition -> {
+                            rootTabLayout.setBackgroundColor(ContextCompat.getColor(tabLayout.context,
+                                    R.color.colorTabSelected))
+                        }
 
-Тут вы должны задаться вопросом! WTF! Никита, что ты творишь????
-
-![](https://alicegellmdia5003.files.wordpress.com/2015/05/what_meme.jpg)
-
-Но одну секунду. Давайте взглянем и проанализируем  откуда вызывается метод  `selectTab` .  Данный метод вызывается из четырёх мест, начнем по порядку: 
-
-1.  Знакомый слушатель?
-
-~~~ java
-
-  public static class TabLayoutOnPageChangeListener implements OnPageChangeListener {
-  ....
-
-        public void onPageSelected(int position) {
-            TabLayout tabLayout = (TabLayout)this.tabLayoutRef.get();
-            if (tabLayout != null && tabLayout.getSelectedTabPosition() != position && position < tabLayout.getTabCount()) {
-                boolean updateIndicator = this.scrollState == 0 || this.scrollState == 2 && this.previousScrollState == 0;
-                tabLayout.selectTab(tabLayout.getTabAt(position), updateIndicator);
+                        //Если таб по позиции расположен выше выбранного
+                        else -> {
+                            rootTabLayout.setBackgroundColor(ContextCompat.getColor(tabLayout.context,
+                                    R.color.colorTabNext))
+                        }
+                    }
+                }
             }
-
-        }
-...
-    }
-
-~~~
-
-Когда мы передаем ViewPager в адаптер методом  `setupWithViewPager`, под капотом происходит добавление данного слушателя. При изменении страницы и вызывается наш необходимый метод. Окей, пока все законно, а что с другими вызывами?
-
-2. Когда мы удаляем какой-либо выбранный таб методом `removeTabAt`.  
-
-~~~ java
-
-    public void removeTabAt(int position) {
-
-        ...
-          
-        if (selectedTabPosition == position) {
-            this.selectTab(this.tabs.isEmpty() ? null : (TabLayout.Tab)this.tabs.get(Math.max(0, position - 1)));
         }
 
     }
 
-~~~
+    //region TabLayout.OnTabSelectedListener
 
-Хорошо, вроде тоже все нормально и под нашим контролем.
+    override fun onTabReselected(p0: TabLayout.Tab) = updateTabs(p0.parent)
 
-3.  Внутри метода `populateFromPagerAdapter`.
-Тут  немного цепочка длинее, но тоже вполне логична. Опять же при добавлении ViewPager, TabLayout вешает слушатель  `PagerAdapterObserver`. Тут признаюсь, я не могу с увереностью сказать в каких случаях вызываются методы данного наблюдателя. Но в докуменатции пишут, что  соответствующие методы вызываются когда набор данных был изменен или стал недействительным. На практике я так и не смог спровоцировать вызовы методов этого слушателя. Но они в свою очередь вызывают  `populateFromPagerAdapter`. Если кто-нибудь может что нибудь добавить по этому слушателю, то можете оставить issue.
-
-4. Внутри метода `select` класса Tab. Например когда происходит программное назначение таба текущим выбранным. Все логично!
-
-![](http://memesmix.net/media/created/ktk2te.jpg)
-
-Теперь когда мы разобрались, в каких случаях вызывается метод `selectTab`.  То можно взглянуть на пример его расширения. 
-
-~~~ java
-
-    override fun selectTab(tab: Tab?, updateIndicator: Boolean) {
-        super.selectTab(tab, updateIndicator)
-        updateTabs()
+    override fun onTabUnselected(p0: TabLayout.Tab) {
+        //do nothing
     }
 
+    override fun onTabSelected(p0: TabLayout.Tab) = updateTabs(p0.parent)
+
+    //endregion TabLayout.OnTabSelectedListener
+
+}
+
 ~~~
 
+Как видно, кастомизация табов дело весьма простое.
 В  данном примере метод `updateTabs` обновляет цветовую схему табов  с учетом их позиций, но вы можете легко реализовать свою логику состояния для отображения.
 
-Вот и все! Удачи!
+На этом все! Удачи!
