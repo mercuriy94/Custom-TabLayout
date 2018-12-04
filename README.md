@@ -67,7 +67,7 @@ class SampleTabListener : TabLayout.OnTabSelectedListener {
 
             tabLayout.getTabAt(i)?.let { tab ->
               
-                //Устанавливем камтомную вью, если этого небыло сделанно ранее
+                //Устанавливем камтомную вью, если этого небыло сделанно раннее
                 if (tab.customView == null) {
                     val tabView = LayoutInflater.from(tabLayout.context)
                             .inflate(R.layout.custom_tab, tabLayout, false)
